@@ -1,37 +1,45 @@
-#include <Windows.h>
-#include <Engine/Engine.h>
-#include <string>
+#include <Windows.h>                          // Other libraries (API del sistema)
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+#include "../../Engine/Include/Engine/Engine.h" // Project header
+#include "../Include/Window.h"                  // Project header
+
+int APIENTRY wWinMain(
+    _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR lpCmdLine,
-    _In_ int nCmdShow) {
+    _In_ int nCmdShow)
+{
+    // 1. Instanciar y crear la ventana
+    Window window;
 
-    const int testResult = Engine_RunSmokeTest();
-
-    std::wstring message = L"Engine cargado: ";
-    message += Engine_GetName();
-
-    if (testResult != 0)
+    // Le pasamos la instancia, el titulo, y el tamaño (800x600)
+    if (!window.Create(hInstance, L"GuerreroEngine - Motor 3D", 800, 600))
     {
-        message += L"\n\nDirectX 11: OK";
-        message += L"\nDirectXTK: OK";
-        message += L"\nEngine.dll: OK";
-        message += L"\nEngine.lib: OK";
-    }
-    else
-    {
-        message += L"\n\nError durante la validacion.";
+        return -1; // Si falla la creacion, salimos
     }
 
-    MessageBoxW(
-        nullptr,
-        message.c_str(),
-        L"Sandbox - Smoke Test",
-        testResult != 0
-        ? MB_OK | MB_ICONINFORMATION
-        : MB_OK | MB_ICONERROR
-    );
+    // Mostramos la ventana en pantalla
+    window.Show(nCmdShow);
 
-    return testResult != 0 ? 0 : 1;
+    // 2. Instanciar e inicializar el motor
+    Engine engine;
+
+    // Le pasamos el identificador de la ventana (HWND) y las mismas medidas
+    if (!engine.Initialize(window.GetHandle(), 800, 600))
+    {
+        return -1; // Si falla la inicializacion de DirectX, salimos
+    }
+
+    // 3. Bucle principal del juego (Game Loop)
+    // Mientras la ventana siga recibiendo mensajes (no se haya cerrado)...
+    while (window.ProcessMessages())
+    {
+        // ... el motor sigue dibujando cuadros
+        engine.Render();
+    }
+
+    // 4. Limpieza al cerrar la ventana
+    engine.Shutdown();
+
+    return 0;
 }
