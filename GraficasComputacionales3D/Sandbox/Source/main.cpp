@@ -1,45 +1,89 @@
-#include <Windows.h>                          // Other libraries (API del sistema)
+#include <Engine/Engine.h>
+#include <Window.h>
 
-#include "../../Engine/Include/Engine/Engine.h" // Project header
-#include "../Include/Window.h"                  // Project header
 
-int APIENTRY wWinMain(
-    _In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR lpCmdLine,
-    _In_ int nCmdShow)
-{
-    // 1. Instanciar y crear la ventana
+/**
+ * @brief Punto de entrada principal de la aplicacion en Windows
+ * se encarga de crear la ventana, inicializar el engin
+ * ejecutar el ciclo principal de la aplicación y liberar
+ * los recursos cuando la ventana se cierra
+ * @param instance Instancia actual de la aplicacion
+ * @param previousInstance Instancia anterior de la aplicacion (siempre NULL)
+ * @param commandLine Argumentos recibidos desde la línea de comandos.
+ * @param showCommand Indica cómo se debe mostrar la ventan
+ * @return 0 si la aplicación termina correctamente
+ * @return 1 si ocurre un error al crear la ventana o inicializar el engine
+ */
+
+int WINAPI
+wWinMain(HINSTANCE instance,
+    HINSTANCE previousInstance,
+    PWSTR commandLine,
+    int showCommand) {
+
+    // Eestos parmetros no se utilizan en esta aplicacion
+    UNREFERENCED_PARAMETER(previousInstance);
+    UNREFERENCED_PARAMETER(commandLine);
+
+    //tamaño de la ventana 
+    constexpr UINT CLIENT_WIDTH = 1280;
+    constexpr UINT CLIENT_HEIGHT = 720;
+
     Window window;
 
-    // Le pasamos la instancia, el titulo, y el tamaño (800x600)
-    if (!window.Create(hInstance, L"GuerreroEngine - Motor 3D", 800, 600))
+
+    //Aqui se crea la ventana y configura el tamaño y titulo
+    if (!window.Create(instance, L"Spider Engine", CLIENT_WIDTH, CLIENT_HEIGHT))
     {
-        return -1; // Si falla la creacion, salimos
+        MessageBoxW(
+            nullptr,
+            L"No se pudo crar la ventana. ",
+            L"Sandbox Error",
+            MB_OK | MB_ICONERROR
+        );
+        return 1;
     }
 
-    // Mostramos la ventana en pantalla
-    window.Show(nCmdShow);
 
-    // 2. Instanciar e inicializar el motor
     Engine engine;
-
-    // Le pasamos el identificador de la ventana (HWND) y las mismas medidas
-    if (!engine.Initialize(window.GetHandle(), 800, 600))
+    //Inicialza el engine utilizando la ventana creada
+    if (!engine.Initialize(window.GetHandle(), CLIENT_WIDTH, CLIENT_HEIGHT))
     {
-        return -1; // Si falla la inicializacion de DirectX, salimos
+        MessageBoxW(
+            window.GetHandle(),
+            L"No se pudo inicializar el Engine. \n\n"
+            L"Verifica que exista:\n"
+            L"shaders\\Cube.hlsl\n\n"
+            L"Reisa tambien la ventana Output. ",
+            L"Engine Error",
+            MB_OK | MB_ICONERROR
+        );
+
+        return 1;
     }
 
-    // 3. Bucle principal del juego (Game Loop)
-    // Mientras la ventana siga recibiendo mensajes (no se haya cerrado)...
+    //muestra la ventana en la pantalla
+    window.Show(showCommand);
+
+
+    //ciclo principal de la aplicacion
     while (window.ProcessMessages())
     {
-        // ... el motor sigue dibujando cuadros
+        //si se minimiza la ventana no es necesario renderizarla
+        if (window.IsMinimized())
+        {
+            WaitMessage();
+            continue;
+        }
         engine.Render();
     }
 
-    // 4. Limpieza al cerrar la ventana
+    //libera los recrusos utilizados por el engine
     engine.Shutdown();
 
+    //destruye la ventana y libera sus recursos
+    window.Destroy();
+
     return 0;
+
 }

@@ -1,178 +1,169 @@
-#include "../Include/Window.h" // Self-include
+#include "Window.h"
 
-#include <Windows.h>           // Other libraries (API del sistema)
 
 Window::~Window()
 {
-    Destroy();
+	Destroy();
 }
 
-bool Window::Create(
-    HINSTANCE instance,
-    const wchar_t* tittle,
-    UINT clientWidth,
-    UINT clientHeight) noexcept
-{
-    // Se dividió la condición para respetar el límite de 80 caracteres
-    if (m_handle || !instance || !tittle ||
-        clientWidth == 0 || clientHeight == 0)
-    {
-        return false;
-    }
+bool
+Window::Create(HINSTANCE instance, const wchar_t* tittle,
+	UINT clientWidth, UINT clientHeight) noexcept {
+	if (m_handle || !instance || !tittle ||
+		clientWidth == 0 || clientHeight == 0)
+	{
+		return false;
+	}
 
-    // Configuracion de la clase de ventana
-    WNDCLASSEXW windowClass{};
-    windowClass.cbSize = sizeof(windowClass);
+	//configuracion de la clase de ventana
+	WNDCLASSEXW windowClass{};
+	windowClass.cbSize = sizeof(windowClass);
 
-    // Funcion que recibira los mensajes de Windows
-    windowClass.lpfnWndProc = WindowProcedure;
+	//funcion que recibira los mensajes de Windows
+	windowClass.lpfnWndProc = WindowProcedure;
+	//instancia de la aplicacion
+	windowClass.hInstance = instance;
+	//cursor que utilizara la ventaana
+	windowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
+	//nombre de la clase de la ventana 
+	windowClass.lpszClassName = ClassName;
 
-    // Instancia de la aplicacion
-    windowClass.hInstance = instance;
+	//registra la clase de ventana en windows
+	if (!RegisterClassExW(&windowClass))
+		return false;
 
-    // Cursor que utilizara la ventana
-    windowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
+	m_instance = instance;
+	m_classRegistered = true;
 
-    // Nombre de la clase de la ventana 
-    windowClass.lpszClassName = ClassName;
+	//estilo de la ventana
+	constexpr DWORD style =
+		WS_OVERLAPPED |
+		WS_CAPTION |
+		WS_SYSMENU |
+		WS_MINIMIZEBOX;
 
-    // Registra la clase de ventana en windows
-    if (!RegisterClassExW(&windowClass))
-    {
-        return false;
-    }
+	//define el tamaño del area dinterna de la ventana
+	RECT rectangle{
+		0,
+		0,
+		static_cast<LONG>(clientWidth),
+		static_cast<LONG>(clientHeight)
+	};
 
-    m_instance = instance;
-    m_classRegistered = true;
+	//ajusta el tamaño total de la ventana
+	if (!AdjustWindowRect(&rectangle, style, FALSE))
+	{
+		Destroy();
+		return false;
+	}
 
-    // Estilo de la ventana
-    constexpr DWORD style =
-        WS_OVERLAPPED |
-        WS_CAPTION |
-        WS_SYSMENU |
-        WS_MINIMIZEBOX;
+	const int ouerWidth = rectangle.right - rectangle.left;
 
-    // Define el tamaño del area interna de la ventana
-    RECT rectangle{
-      0,
-      0,
-      static_cast<LONG>(clientWidth),
-      static_cast<LONG>(clientHeight) // BUG CORREGIDO: Aqui decia clientWidth
-    };
+	const int outerHeight = rectangle.bottom - rectangle.top;
 
-    // Ajusta el tamaño total de la ventana
-    if (!AdjustWindowRect(&rectangle, style, FALSE))
-    {
-        Destroy();
-        return false;
-    }
+	//crea la ventana de Windows
+	m_handle = CreateWindowExW(
+		0,
+		ClassName,
+		tittle,
+		style,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		ouerWidth,
+		outerHeight,
+		nullptr,
+		nullptr,
+		instance,
+		this
+	);
 
-    const int outerWidth = rectangle.right - rectangle.left;
-    const int outerHeight = rectangle.bottom - rectangle.top;
-
-    // Crea la ventana de Windows
-    m_handle = CreateWindowExW(
-        0,
-        ClassName,
-        tittle,
-        style,
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
-        outerWidth,
-        outerHeight,
-        nullptr,
-        nullptr,
-        instance,
-        this
-    );
-
-    // Si no se pudo crear elimina los recursos que se hayan creado
-    if (!m_handle)
-    {
-        Destroy();
-        return false;
-    }
-
-    return true;
+	//si no se pudo crear elimina los recursos que se hayan creado
+	if (!m_handle)
+	{
+		Destroy();
+		return false;
+	}
+	return true;
 }
 
-void Window::Show(int showCommand) noexcept
-{
-    if (m_handle)
-    {
-        ShowWindow(m_handle, showCommand);
-        UpdateWindow(m_handle);
-    }
+void
+Window::Show(int showCommand) noexcept {
+	if (m_handle)
+	{
+		ShowWindow(m_handle, showCommand);
+		UpdateWindow(m_handle);
+	}
 }
 
-void Window::Destroy() noexcept
-{
-    // Verifica si existe la ventana y la destruye
-    if (m_handle)
-    {
-        DestroyWindow(m_handle);
-        m_handle = nullptr;
-    }
+void
+Window::Destroy() noexcept {
+	//verifica si existe la ventana y  la destruye
+	if (m_handle)
+	{
+		DestroyWindow(m_handle);
+		m_handle = nullptr;
+	}
 
-    if (m_classRegistered)
-    {
-        UnregisterClassW(ClassName, m_instance);
-        m_classRegistered = false;
-    }
 
-    m_instance = nullptr;
+	if (m_classRegistered)
+	{
+		UnregisterClassW(ClassName, m_instance);
+		m_classRegistered = false;
+	}
+
+	m_instance = nullptr;
 }
 
-bool Window::ProcessMessages() noexcept
-{
-    MSG message{};
+bool
+Window::ProcessMessages() noexcept {
+	MSG message{};
 
-    // Obtiene y procesa todos los mensajes pendientes
-    while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE))
-    {
-        if (message.message == WM_QUIT)
-        {
-            return false;
-        }
+	//obtiene y procesa todos los mensajes pendientes
+	while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE))
+	{
+		if (message.message == WM_QUIT)
+			return false;
 
-        // Traduce el mensaje antes de enviarlo al procedimiento
-        TranslateMessage(&message);
-
-        // Envia el mensaje al windowProcedure
-        DispatchMessageW(&message);
-    }
-
-    return true;
+		//traduuce el mensaje antes de enviarlo al procedimeinto
+		TranslateMessage(&message);
+		//envia el mensaje al windowProdcedure
+		DispatchMessageW(&message);
+	}
+	return true;
 }
 
-bool Window::IsMinimized() const noexcept
-{
-    return m_handle && IsIconic(m_handle);
+
+bool
+Window::IsMinimized() const noexcept {
+	return m_handle && IsIconic(m_handle);
 }
 
-HWND Window::GetHandle() const noexcept
-{
-    return m_handle;
+HWND
+Window::GetHandle() const noexcept {
+	return m_handle;
 }
 
 LRESULT CALLBACK Window::WindowProcedure(
-    HWND handle,
-    UINT message,
-    WPARAM wParam,
-    LPARAM lParam)
+	HWND handle,
+	UINT message,
+	WPARAM wParam,
+	LPARAM lParam
+)
 {
-    switch (message)
-    {
-    case WM_ERASEBKGND:
-        // DirectX limpia el back buffer.
-        return 1;
+	switch (message)
+	{
+	case WM_ERASEBKGND:
+		//DirectX limpia el back buffer.
+		return 1;
 
-    case WM_DESTROY:
-        // Indica a windows que la aplicacion debe terminar
-        PostQuitMessage(0);
-        return 0;
 
-    default:
-        return DefWindowProcW(handle, message, wParam, lParam);
-    }
+
+	case WM_DESTROY:
+		//indica a windows que la aplicacion debe terminar
+		PostQuitMessage(0);
+		return 0;
+
+	default:
+		return DefWindowProcW(handle, message, wParam, lParam);
+	}
 }

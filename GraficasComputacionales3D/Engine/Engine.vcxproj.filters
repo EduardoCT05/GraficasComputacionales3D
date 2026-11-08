@@ -16,6 +16,15 @@
     <Filter Include="Archivos de encabezado\Engine">
       <UniqueIdentifier>{87e7c457-ad6d-4dc2-a826-69958f0949c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de origen\Engine">
+      <UniqueIdentifier>{e6f78a4a-ecb5-48b3-8cd0-9fa0deb2fab4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\Rendering">
+      <UniqueIdentifier>{bc89c6c8-7dc3-4d4b-ba4a-0a06eb83a5ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Rendering">
+      <UniqueIdentifier>{684539ed-8d19-4214-ba60-4b1fb832fde4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Engine\API.h">
@@ -25,6 +34,24 @@
       <Filter>Archivos de encabezado\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Include\Engine\Prerequisites.h">
+      <Filter>Archivos de encabezado\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Rendering\Buffer.h">
+      <Filter>Archivos de encabezado\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Rendering\Device.h">
+      <Filter>Archivos de encabezado\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Rendering\DeviceContext.h">
+      <Filter>Archivos de encabezado\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Rendering\SwapChain.h">
+      <Filter>Archivos de encabezado\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Rendering\Texture2D.h">
+      <Filter>Archivos de encabezado\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Engine\MeshComponent.h">
       <Filter>Archivos de encabezado\Engine</Filter>
     </ClInclude>
   </ItemGroup>
@@ -37,8 +64,20 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Engine.cpp">
-      <Filter>Archivos de origen</Filter>
+    <ClCompile Include="Source\Engine\Engine.cpp">
+      <Filter>Archivos de origen\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Buffer.cpp">
+      <Filter>Archivos de origen\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Device.cpp">
+      <Filter>Archivos de origen\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\DeviceContext.cpp">
+      <Filter>Archivos de origen\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Texture2D.cpp">
+      <Filter>Archivos de origen\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

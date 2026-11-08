@@ -26,7 +26,13 @@
   <ItemGroup>
     <ClInclude Include="Include\Engine\API.h" />
     <ClInclude Include="Include\Engine\Engine.h" />
+    <ClInclude Include="Include\Engine\MeshComponent.h" />
     <ClInclude Include="Include\Engine\Prerequisites.h" />
+    <ClInclude Include="Include\Rendering\Buffer.h" />
+    <ClInclude Include="Include\Rendering\Device.h" />
+    <ClInclude Include="Include\Rendering\DeviceContext.h" />
+    <ClInclude Include="Include\Rendering\SwapChain.h" />
+    <ClInclude Include="Include\Rendering\Texture2D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shaders\Triangle.hsls">
@@ -37,7 +43,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Engine.cpp" />
+    <ClCompile Include="Source\Engine\Engine.cpp" />
+    <ClCompile Include="Source\Rendering\Buffer.cpp" />
+    <ClCompile Include="Source\Rendering\Device.cpp" />
+    <ClCompile Include="Source\Rendering\DeviceContext.cpp" />
+    <ClCompile Include="Source\Rendering\Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shaders\Cube.hlsl">
