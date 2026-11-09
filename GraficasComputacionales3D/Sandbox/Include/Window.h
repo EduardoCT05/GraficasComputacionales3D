@@ -10,7 +10,6 @@
 
 #include <Windows.h>
 
-
 /**
  * @brief Representa y administra una ventana de Windows
  * la clase se encarga de crear mostrar procesar mensajes
@@ -24,38 +23,37 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-
 	/**
-	* @brief Crea la ventana de Windows
-	* Registra la clase de ventana y crea la ventana
-	* con el tamaño indicado
-	* @param instance Instancia de la aplicacion
-	* @param tittle Título que tendrá la ventana
-	* @param clientWidth Ancho del area interna
-	* @param clientHeight Alto del area interna
-	* @return true si la ventana se creo correctamente
-	* @return false si ocurrió algun error
-	*/
+	 * @brief Crea la ventana de Windows
+	 * Registra la clase de ventana y crea la ventana
+	 * con el tamaño indicado
+	 * @param instance Instancia de la aplicacion
+	 * @param tittle Título que tendrá la ventana
+	 * @param clientWidth Ancho del area interna
+	 * @param clientHeight Alto del area interna
+	 * @return true si la ventana se creo correctamente
+	 * @return false si ocurrió algun error
+	 */
 	bool
 		Create(HINSTANCE instance, const wchar_t* tittle,
 			UINT clientWidth, UINT clientHeight) noexcept;
 
-	//Indica como debe mostrar la ventana
+	// Indica como debe mostrar la ventana
 	void
 		Show(int showCommand) noexcept;
 
-	//Destruye la ventana y libera sus recursos
+	// Destruye la ventana y libera sus recursos
 	void
 		Destroy() noexcept;
 
-	//Devuelve false cuando se recibe WM_QUIT.
+	// Devuelve false cuando se recibe WM_QUIT.
 	bool
 		ProcessMessages() noexcept;
 
 	HWND
 		GetHandle() const noexcept;
 
-	//es verdadero si la ventana es minimizada
+	// es verdadero si la ventana es minimizada
 	bool
 		IsMinimized() const noexcept;
 
