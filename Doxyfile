@@ -1,0 +1,9 @@
+PROJECT_NAME           = "GraficasComputacionales3D"
+OUTPUT_DIRECTORY       = docs
+HTML_OUTPUT            = .
+GENERATE_LATEX         = NO
+INPUT                  = .
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+FILE_PATTERNS          = *.c *.cpp *.h *.hpp *.hlsl
+EXCLUDE_PATTERNS       = */.vs/* */intermediate/* */bin/* */ThirdParties/*
