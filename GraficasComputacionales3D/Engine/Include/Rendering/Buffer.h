@@ -1,100 +1,106 @@
 #pragma once
-#include "Engine/Prerequisites.h"
+
+// Proyect Headers
 #include "Engine/MeshComponent.h"
+#include "Engine/Prerequisites.h"
 
 class Device;
 class DeviceContext;
 
-/**
- * @class Buffer
- * @brief Funciona como una caja de memoria dentro de la tarjeta de video.
- *
- * La tarjeta de video no puede leer directamente la memoria normal de
- * la computadora. Para que pueda usar los datos de una figura
- * primero hay que copiarlos a una caja
- * especial dentro de la tarjeta. Esta clase se encarga de crear esa caja,
- * llenarla, actualizarla, usarla para dibujar y borrarla al terminar.
- */
-class
-    Buffer {
+/// Funciona como una caja de memoria dentro de la tarjeta de video.
+/// La tarjeta de video no puede leer directamente la memoria normal de
+/// la computadora. Para que pueda usar los datos de una figura, primero
+/// hay que copiarlos a una caja especial dentro de la tarjeta. Esta clase
+/// se encarga de crear esa caja, llenarla, actualizarla, usarla para
+/// dibujar y borrarla al terminar.
+class Buffer
+{
 public:
-
     Buffer() = default;
-
     ~Buffer() = default;
 
-    /**
-   * @brief Crea la caja y la llena con los datos de una figura 3D
-   * Toma los puntos o las conexiones de la malla y los copia a la
-   * tarjeta de video, listos para dibujar
-   * @param device   La tarjeta de video con la que se va a trabajar
-   * @param mesh     La figura 3D de donde se sacan los datos
-   * @param bindFlag Indica para qué se usará la caja
-   * @return Un resultado que dice si todo salió bien o si hubo un error
-   */
+    /// Crea la caja y la llena con los datos de una figura 3D.
+    /// Toma los puntos o las conexiones de la malla y los copia a la
+    /// tarjeta de video, listos para dibujar.
+    /// device: La tarjeta de video con la que se va a trabajar.
+    /// mesh: La figura 3D de donde se sacan los datos.
+    /// bindFlag: Indica para que se usara la caja.
+    /// Devuelve un resultado que indica si todo salio bien o hubo un error.
     HRESULT
         init(Device& device, const MeshComponent& mesh, unsigned int bindFlag);
 
-    /**
-    * @brief Crea una caja vacía de un tamaño determinado
-    * Sirve para datos que cambian seguido
-    * y que se llenarán después con update()
-    * @param device    La tarjeta de video con la que se va a trabajar
-    * @param ByteWidth El tamaño de la caja, medido en bytes
-    * @return Un resultado que dice si todo salió bien o si hubo un error
-    */
+    /// Crea una caja vacia de un tamano determinado.
+    /// Sirve para datos que cambian seguido y que se llenaran
+    /// despues con update().
+    /// device: La tarjeta de video con la que se va a trabajar.
+    /// ByteWidth: El tamano de la caja, medido en bytes.
+    /// Devuelve un resultado que indica si todo salio bien o hubo un error.
     HRESULT
         init(Device& device, unsigned int ByteWidth);
 
-    /**
- * @brief Le dice a la tarjeta de video que use esta caja para dibujar.
- *
- * @param deviceContext  El "mensajero" que envía las órdenes a la
- *  tarjeta de video
- * @param StartSlot El numero de lugar donde se va a colocar la caja
- * @param NumBuffers Cuantas cajas se van a colocar
- * @param setPixelShader Si es verdadero, la caja también se pone a
- *  disposición del programa que pinta los colores
- * @param format Forma en que están escritos los dato
- */
+    /// Actualiza los datos almacenados dentro de la caja en la tarjeta de video.
+    /// deviceContext: El mensajero que envia las ordenes a la tarjeta de video.
+    /// pDstResource: Recurso de destino que se va a actualizar.
+    /// DstSubresource: Indice del subrecurso de destino.
+    /// pDstBox: Region del recurso donde se copiaran los datos.
+    /// pSrcData: Puntero a los datos nuevos que se van a copiar.
+    /// SrcRowPitch: Tamano en bytes de una fila de datos.
+    /// SrcDepthPitch: Tamano en bytes de una capa de profundidad.
     void
-        update(DeviceContext& deviceContext,
+        update(
+            DeviceContext& deviceContext,
             ID3D11Resource* pDstResource,
-            unsigned int    DstSubresource,
+            unsigned int DstSubresource,
             const D3D11_BOX* pDstBox,
             const void* pSrcData,
-            unsigned int    SrcRowPitch,
-            unsigned int    SrcDepthPitch);
+            unsigned int SrcRowPitch,
+            unsigned int SrcDepthPitch
+        );
 
+    /// Le dice a la tarjeta de video que use esta caja para dibujar.
+    /// deviceContext: El mensajero que envia las ordenes a la tarjeta de video.
+    /// StartSlot: El numero de lugar donde se va a colocar la caja.
+    /// NumBuffers: Cuantas cajas se van a colocar.
+    /// setPixelShader: Si es verdadero, la caja tambien se pone a disposicion
+    /// del programa que pinta los colores.
+    /// format: Forma en que estan escritos los datos.
     void
-        render(DeviceContext& deviceContext,
-            unsigned int   StartSlot,
-            unsigned int   NumBuffers,
-            bool           setPixelShader = false,
-            DXGI_FORMAT    format = DXGI_FORMAT_UNKNOWN);
+        render(
+            DeviceContext& deviceContext,
+            unsigned int StartSlot,
+            unsigned int NumBuffers,
+            bool setPixelShader = false,
+            DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN
+        );
+
+    /// Libera la memoria de la caja en la tarjeta de video.
     void
         destroy();
 
-    /**
-   * @brief Fabrica la caja en la tarjeta de video a partir de una descripción
-   * Es el paso de bajo nivel que usan los dos init() para crear la caja
-   * @param device   La tarjeta de video con la que se va a trabajar
-   * @param initData Los datos con los que se llena al inicio
-   * @return Un resultado que dice si todo salió bien o si hubo un error
-   */
+    /// Fabrica la caja en la tarjeta de video a partir de una descripcion.
+    /// Es el paso de bajo nivel que usan los dos init() para crear la caja.
+    /// device: La tarjeta de video con la que se va a trabajar.
+    /// desc: Descripcion de las propiedades del buffer.
+    /// initData: Los datos con los que se llena al inicio.
+    /// Devuelve un resultado que indica si todo salio bien o hubo un error.
     HRESULT
-        createBuffer(Device& device,
+        createBuffer(
+            Device& device,
             D3D11_BUFFER_DESC& desc,
-            D3D11_SUBRESOURCE_DATA* initData);
+            D3D11_SUBRESOURCE_DATA* initData
+        );
 
-    /**
-    * @brief Devuelve la caja de la tarjeta de video para usarla directamente
-    * @return Un puntero a la caja
-    */
-    ID3D11Buffer* getBuffer() const { return m_buffer; }
+    /// Devuelve la caja de la tarjeta de video para usarla directamente.
+    /// Devuelve un puntero a la caja.
+    ID3D11Buffer*
+        getBuffer() const
+    {
+        return m_buffer;
+    }
 
 public:
     ID3D11Buffer* m_buffer = nullptr;
+
 private:
     unsigned int m_stride = 0;
     unsigned int m_offset = 0;

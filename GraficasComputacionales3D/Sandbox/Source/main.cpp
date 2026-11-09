@@ -1,41 +1,43 @@
-#include <Engine/Engine.h>
-#include "Window.h"
+// Other libraries 
 #include <Windows.h>
 
-/**
- * @brief Punto de entrada principal de la aplicacion en Windows
- * se encarga de crear la ventana, inicializar el engine
- * ejecutar el ciclo principal de la aplicación y liberar
- * los recursos cuando la ventana se cierra
- * @param instance Instancia actual de la aplicacion
- * @param previousInstance Instancia anterior de la aplicacion (siempre NULL)
- * @param commandLine Argumentos recibidos desde la línea de comandos.
- * @param showCommand Indica cómo se debe mostrar la ventana
- * @return 0 si la aplicación termina correctamente
- * @return 1 si ocurre un error al crear la ventana o inicializar el engine
- */
+// Proyect Headers
+#include <Engine/Engine.h>
+#include "Window.h"
+
+/// Punto de entrada principal de la aplicacion en Windows.
+/// Se encarga de crear la ventana, inicializar el engine,
+/// ejecutar el ciclo principal de la aplicación y liberar
+/// los recursos cuando la ventana se cierra.
+/// instance: Instancia actual de la aplicacion.
+/// previousInstance: Instancia anterior de la aplicacion (siempre NULL).
+/// commandLine: Argumentos recibidos desde la línea de comandos.
+/// showCommand: Indica cómo se debe mostrar la ventana.
+/// Devuelve 0 si la aplicación termina correctamente o 1 si ocurre un error.
 int WINAPI
-wWinMain(HINSTANCE instance,
+wWinMain(
+    HINSTANCE instance,
     HINSTANCE previousInstance,
     PWSTR commandLine,
-    int showCommand) {
-
-    // Estos parametros no se utilizan en esta aplicacion
+    int showCommand
+)
+{
+    /// Estos parametros no se utilizan en esta aplicacion
     UNREFERENCED_PARAMETER(previousInstance);
     UNREFERENCED_PARAMETER(commandLine);
 
-    // tamaño de la ventana 
+    /// Tamaño de la ventana
     constexpr UINT CLIENT_WIDTH = 1280;
     constexpr UINT CLIENT_HEIGHT = 720;
 
     Window window;
 
-    // Aqui se crea la ventana y configura el tamaño y titulo
-    if (!window.Create(instance, L"Spider Engine", CLIENT_WIDTH, CLIENT_HEIGHT))
+    /// Aqui se crea la ventana y configura el tamaño y titulo
+    if (!window.Create(instance, L"Motor Grafico 3D", CLIENT_WIDTH, CLIENT_HEIGHT))
     {
         MessageBoxW(
             nullptr,
-            L"No se pudo crear la ventana. ",
+            L"No se pudo crear la ventana.",
             L"Sandbox Error",
             MB_OK | MB_ICONERROR
         );
@@ -43,15 +45,16 @@ wWinMain(HINSTANCE instance,
     }
 
     Engine engine;
-    // Inicializa el engine utilizando la ventana creada
+
+    /// Inicializa el engine utilizando la ventana creada
     if (!engine.Initialize(window.GetHandle(), CLIENT_WIDTH, CLIENT_HEIGHT))
     {
         MessageBoxW(
             window.GetHandle(),
-            L"No se pudo inicializar el Engine. \n\n"
+            L"No se pudo inicializar el Engine.\n\n"
             L"Verifica que exista:\n"
             L"shaders\\Cube.hlsl\n\n"
-            L"Revisa tambien la ventana Output. ",
+            L"Revisa tambien la ventana Output.",
             L"Engine Error",
             MB_OK | MB_ICONERROR
         );
@@ -59,13 +62,13 @@ wWinMain(HINSTANCE instance,
         return 1;
     }
 
-    // muestra la ventana en la pantalla
+    /// Muestra la ventana en la pantalla
     window.Show(showCommand);
 
-    // ciclo principal de la aplicacion
+    /// Ciclo principal de la aplicacion
     while (window.ProcessMessages())
     {
-        // si se minimiza la ventana no es necesario renderizarla
+        /// Si se minimiza la ventana no es necesario renderizarla
         if (window.IsMinimized())
         {
             WaitMessage();
@@ -74,10 +77,10 @@ wWinMain(HINSTANCE instance,
         engine.Render();
     }
 
-    // libera los recursos utilizados por el engine
+    /// Libera los recursos utilizados por el engine
     engine.Shutdown();
 
-    // destruye la ventana y libera sus recursos
+    /// Destruye la ventana y libera sus recursos
     window.Destroy();
 
     return 0;
